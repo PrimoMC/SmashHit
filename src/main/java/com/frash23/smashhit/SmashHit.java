@@ -165,12 +165,12 @@ public class SmashHit extends JavaPlugin implements Listener
         hitListenerHandler = hl;
     }
 
-    boolean isListening()
+    public boolean isListening()
     {
         return listening;
     }
 
-    boolean isDebug()
+    public boolean isDebug()
     {
         return debugging;
     }
@@ -178,5 +178,13 @@ public class SmashHit extends JavaPlugin implements Listener
     public static SmashHit getInstance()
     {
         return instance;
+    }
+
+    public static void debug( String msg )
+    {
+        if ( getInstance().isDebug() )
+        {
+            getInstance().getLogger().info( "[debug] " + msg );
+        }
     }
 }

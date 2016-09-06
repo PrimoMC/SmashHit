@@ -8,13 +8,14 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
-import com.frash23.smashhit.Event.AsyncPreDamageEvent;
 import com.frash23.smashhit.DamageResolver;
+import com.frash23.smashhit.Event.AsyncPreDamageEvent;
 import com.frash23.smashhit.SmashHit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -93,7 +94,7 @@ public class SmashHitListener extends PacketAdapter
         PacketContainer packet = e.getPacket();
         Player attacker = e.getPlayer();
         Entity entity = packet.getEntityModifier( e ).read( 0 );
-        Damageable target = entity instanceof Damageable ? (Damageable) entity : null;
+        LivingEntity target = entity instanceof LivingEntity ? (LivingEntity) entity : null;
         World world = attacker.getWorld();
 
         /* Huge if() block to verify the hit request */
@@ -107,7 +108,7 @@ public class SmashHitListener extends PacketAdapter
 
             /* The check above ensures we can roll our own hits */
             e.setCancelled( true );
-            if(lastHit.containsKey( target.getUniqueId() ) && System.currentTimeMillis() - lastHit.get( target.getUniqueId() ) < IMMUNITY_MILLI)
+            if ( lastHit.containsKey( target.getUniqueId() ) && System.currentTimeMillis() - lastHit.get( target.getUniqueId() ) < IMMUNITY_MILLI )
             {
                 return;
             }

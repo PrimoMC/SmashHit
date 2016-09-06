@@ -1,6 +1,6 @@
 name: SmashHit
 version: "1.0-RC2"
-author: "frash23"
+authors: ["frash23", "kukelekuuk00"]
 main: "com.frash23.smashhit.SmashHit"
 depend: [ ProtocolLib ]
 softdepend: [ WorldGuard ]

@@ -1,8 +1,8 @@
 package com.frash23.smashhit;
 
+import com.frash23.smashhit.Particle.ParticleEffect;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class DamageResolver
@@ -15,12 +15,19 @@ public class DamageResolver
 
     private boolean USE_CRITS, OLD_CRITS;
 
-    public double getDamage( Player damager, Damageable entity )
+    public double getDamage( Player damager, LivingEntity entity )
     {
         double damage = damager.getAttribute( Attribute.GENERIC_ATTACK_DAMAGE ).getValue();
-        if ( USE_CRITS && !( (Entity) damager ).isOnGround() && damager.getVelocity().getY() < 0 && OLD_CRITS || !damager.isSprinting() )
+        if ( USE_CRITS )
         {
-            damage *= 1.5;
+            if ( ( !damager.isOnGround() && damager.getVelocity().getY() < 0 ) )
+            {
+                if ( !( !OLD_CRITS && damager.isSprinting() ) )
+                {
+                    damage *= 1.5;
+                    ParticleEffect.CRIT.display( 0, 0, 0, .5f, 10, entity.getEyeLocation(), 16 );
+                }
+            }
         }
         return damage;
     }
