@@ -8,7 +8,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
-import com.frash23.smashhit.AsyncPreDamageEvent;
+import com.frash23.smashhit.Event.AsyncPreDamageEvent;
 import com.frash23.smashhit.DamageResolver;
 import com.frash23.smashhit.SmashHit;
 import org.bukkit.GameMode;

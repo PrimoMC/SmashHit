@@ -1,4 +1,4 @@
-package com.frash23.smashhit;
+package com.frash23.smashhit.Event;
 
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;

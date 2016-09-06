@@ -1,6 +1,6 @@
 package com.frash23.smashhit.Listener;
 
-import com.frash23.smashhit.AsyncPreDamageEvent;
+import com.frash23.smashhit.Event.AsyncPreDamageEvent;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.Bukkit;
