@@ -68,11 +68,7 @@ public class SmashHitListener extends PacketAdapter
             while ( hitQueue.size() > 0 )
             {
                 EntityDamageByEntityEvent e = hitQueue.remove();
-                getPluginManager().callEvent( e );
-                if ( !e.isCancelled() )
-                {
-                    ( (Damageable) e.getEntity() ).damage( e.getFinalDamage(), e.getDamager() );
-                }
+                ( (Damageable) e.getEntity() ).damage( e.getFinalDamage(), e.getDamager() );
             }
         }
     }.runTaskTimer( SmashHit.getInstance(), 1, 1 );
