@@ -8,7 +8,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
-import com.frash23.smashhit.damageresolver.DamageResolver;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
