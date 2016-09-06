@@ -20,7 +20,6 @@ public class DamageResolver
 
     public double getDamage( Player damager, Damageable entity )
     {
-
         try
         {
             Object handle = Reflection.getHandle( damager );
