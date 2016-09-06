@@ -91,7 +91,7 @@ class SmashHitListener extends PacketAdapter
         Damageable target = entity instanceof Damageable ? (Damageable) entity : null;
         World world = attacker.getWorld();
 
-		/* Huge if() block to verify the hit request */
+        /* Huge if() block to verify the hit request */
         if ( e.getPacketType() == PacketType.Play.Client.USE_ENTITY            // Packet is for entity interaction
                 && packet.getEntityUseActions().read( 0 ) == EntityUseAction.ATTACK    // Packet is for entity damage
                 && target != null && !target.isDead()                            // Target entity is damageable
@@ -100,10 +100,10 @@ class SmashHitListener extends PacketAdapter
                 && ( !( target instanceof Player ) || ( (Player) target ).getGameMode() != GameMode.CREATIVE ) )
         { // Don't hit Players in creative mode
 
-			/* The check above ensures we can roll our own hits */
+            /* The check above ensures we can roll our own hits */
             e.setCancelled( true );
 
-			/* Construct the fake packet for making the attacker's
+            /* Construct the fake packet for making the attacker's
              * victim appear hit */
             PacketContainer damageAnimation = new PacketContainer( PacketType.Play.Server.ENTITY_STATUS );
             damageAnimation.getIntegers().write( 0, target.getEntityId() );
@@ -121,12 +121,12 @@ class SmashHitListener extends PacketAdapter
 
                     pmgr.sendServerPacket( attacker, damageAnimation );
 
-					/* Check if attacker's CPS is within the specified maximum */
+                    /* Check if attacker's CPS is within the specified maximum */
                     int attackerCps = cps.containsKey( attacker.getUniqueId() ) ? cps.get( attacker.getUniqueId() ) : 0;
                     cps.put( attacker.getUniqueId(), attackerCps + 1 );
 
-					/* By handling CPS this way, the recorded CPS will still increment even if the limit is reached.
-					 * This should weed out some hackers nicely */
+                    /* By handling CPS this way, the recorded CPS will still increment even if the limit is reached.
+                     * This should weed out some hackers nicely */
                     if ( attackerCps <= MAX_CPS )
                     {
                         hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );

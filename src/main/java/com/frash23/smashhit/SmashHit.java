@@ -58,7 +58,7 @@ public class SmashHit extends JavaPlugin implements Listener
         {
 
 
-			/* We're doing this in a separate thread as we want instantiation in the same thread as the listener itself */
+            /* We're doing this in a separate thread as we want instantiation in the same thread as the listener itself */
             new BukkitRunnable()
             {
                 @Override
