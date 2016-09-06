@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 public class DamageResolver
 {
 
-    static DamageResolver getDamageResolver( boolean USE_CRITS, boolean OLD_CRITS )
+    public static DamageResolver getDamageResolver( boolean USE_CRITS, boolean OLD_CRITS )
     {
         return new DamageResolver( USE_CRITS, OLD_CRITS );
     }

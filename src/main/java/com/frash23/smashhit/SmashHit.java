@@ -3,6 +3,9 @@ package com.frash23.smashhit;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.async.AsyncListenerHandler;
+import com.frash23.smashhit.Listener.SmashHitDebugListener;
+import com.frash23.smashhit.Listener.SmashHitListener;
+import com.frash23.smashhit.Listener.WorldGuardListener;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -172,7 +175,7 @@ public class SmashHit extends JavaPlugin implements Listener
         return debugging;
     }
 
-    static SmashHit getInstance()
+    public static SmashHit getInstance()
     {
         return instance;
     }

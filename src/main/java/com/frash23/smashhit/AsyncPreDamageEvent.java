@@ -15,7 +15,7 @@ public class AsyncPreDamageEvent extends Event
     private Damageable entity;
     private double damage;
 
-    AsyncPreDamageEvent( Player dmgr, Damageable ent, double dmg )
+    public AsyncPreDamageEvent( Player dmgr, Damageable ent, double dmg )
     {
         super( true );
 

@@ -1,5 +1,6 @@
-package com.frash23.smashhit;
+package com.frash23.smashhit.Listener;
 
+import com.frash23.smashhit.AsyncPreDamageEvent;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.Bukkit;
@@ -13,7 +14,7 @@ public class WorldGuardListener implements Listener
 {
     WorldGuardPlugin wg = null;
 
-    WorldGuardListener()
+    public WorldGuardListener()
     {
         wg = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin( "WorldGuard" );
     }

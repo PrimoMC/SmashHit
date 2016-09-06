@@ -1,16 +1,17 @@
-package com.frash23.smashhit;
+package com.frash23.smashhit.Listener;
 
+import com.frash23.smashhit.SmashHit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-class SmashHitDebugListener implements Listener
+public class SmashHitDebugListener implements Listener
 {
     private SmashHit plugin;
 
-    SmashHitDebugListener( SmashHit pl )
+    public SmashHitDebugListener( SmashHit pl )
     {
         plugin = pl;
     }

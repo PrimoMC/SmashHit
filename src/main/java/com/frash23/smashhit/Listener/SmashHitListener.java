@@ -1,4 +1,4 @@
-package com.frash23.smashhit;
+package com.frash23.smashhit.Listener;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -8,6 +8,9 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
+import com.frash23.smashhit.AsyncPreDamageEvent;
+import com.frash23.smashhit.DamageResolver;
+import com.frash23.smashhit.SmashHit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
@@ -24,7 +27,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
-class SmashHitListener extends PacketAdapter
+public class SmashHitListener extends PacketAdapter
 {
     private SmashHit plugin;
     private final long IMMUNITY_MILLI;
@@ -38,7 +41,7 @@ class SmashHitListener extends PacketAdapter
     private static byte MAX_CPS;
     private static float MAX_DISTANCE;
 
-    SmashHitListener( SmashHit pl, long damageImmunity, boolean useCrits, boolean oldCrits, int maxCps, double maxDistance )
+    public SmashHitListener( SmashHit pl, long damageImmunity, boolean useCrits, boolean oldCrits, int maxCps, double maxDistance )
     {
         super( pl, ListenerPriority.HIGH, Collections.singletonList( PacketType.Play.Client.USE_ENTITY ) );
 
@@ -147,7 +150,7 @@ class SmashHitListener extends PacketAdapter
         }
     }
 
-    void stop()
+    public void stop()
     {
         cpsResetter.cancel();
         hitQueueProcessor.cancel();
