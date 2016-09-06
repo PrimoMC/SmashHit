@@ -20,10 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.bukkit.Bukkit.getPluginManager;
@@ -33,7 +30,7 @@ class SmashHitListener extends PacketAdapter {
 	private ProtocolManager pmgr;
 	private DamageResolver damageResolver;
 
-	private Map<Player, Integer> cps = new HashMap<>();
+	private Map<UUID, Integer> cps = new HashMap<>();
 	private Queue<EntityDamageByEntityEvent> hitQueue = new ConcurrentLinkedQueue<>();
 
 	private static byte MAX_CPS;
@@ -105,8 +102,8 @@ class SmashHitListener extends PacketAdapter {
 					pmgr.sendServerPacket(attacker, damageAnimation);
 
 					/* Check if attacker's CPS is within the specified maximum */
-					int attackerCps = cps.containsKey(attacker)? cps.get(attacker) : 0;
-					cps.put( attacker, attackerCps + 1 );
+					int attackerCps = cps.containsKey(attacker.getUniqueId())? cps.get(attacker.getUniqueId()) : 0;
+					cps.put( attacker.getUniqueId(), attackerCps + 1 );
 
 					/* By handling CPS this way, the recorded CPS will still increment even if the limit is reached.
 					 * This should weed out some hackers nicely */
