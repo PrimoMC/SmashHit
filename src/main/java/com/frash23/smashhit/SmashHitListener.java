@@ -28,20 +28,23 @@ import static org.bukkit.Bukkit.getPluginManager;
 class SmashHitListener extends PacketAdapter
 {
     private SmashHit plugin;
+    private final long IMMUNITY_MILLI;
     private ProtocolManager pmgr;
     private DamageResolver damageResolver;
 
     private Map<UUID, Integer> cps = new HashMap<>();
+    private Map<UUID, Long> lastHit = new HashMap<>();
     private Queue<EntityDamageByEntityEvent> hitQueue = new ConcurrentLinkedQueue<>();
 
     private static byte MAX_CPS;
     private static float MAX_DISTANCE;
 
-    SmashHitListener( SmashHit pl, boolean useCrits, boolean oldCrits, int maxCps, double maxDistance )
+    SmashHitListener( SmashHit pl, long damageImmunity, boolean useCrits, boolean oldCrits, int maxCps, double maxDistance )
     {
         super( pl, ListenerPriority.HIGH, Collections.singletonList( PacketType.Play.Client.USE_ENTITY ) );
 
         plugin = pl;
+        this.IMMUNITY_MILLI = damageImmunity;
         pmgr = ProtocolLibrary.getProtocolManager();
 
         damageResolver = DamageResolver.getDamageResolver( useCrits, oldCrits );
@@ -102,7 +105,10 @@ class SmashHitListener extends PacketAdapter
 
             /* The check above ensures we can roll our own hits */
             e.setCancelled( true );
-
+            if(lastHit.containsKey( target.getUniqueId() ) && System.currentTimeMillis() - lastHit.get( target.getUniqueId() ) < IMMUNITY_MILLI)
+            {
+                return;
+            }
             /* Construct the fake packet for making the attacker's
              * victim appear hit */
             PacketContainer damageAnimation = new PacketContainer( PacketType.Play.Server.ENTITY_STATUS );
@@ -129,6 +135,7 @@ class SmashHitListener extends PacketAdapter
                      * This should weed out some hackers nicely */
                     if ( attackerCps <= MAX_CPS )
                     {
+                        lastHit.put( target.getUniqueId(), System.currentTimeMillis() );
                         hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
                     }
                 }

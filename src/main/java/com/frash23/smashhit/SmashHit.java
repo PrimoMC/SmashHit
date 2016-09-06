@@ -64,7 +64,7 @@ public class SmashHit extends JavaPlugin implements Listener
                 @Override
                 public void run()
                 {
-                    setHitListener( new SmashHitListener( instance, getConfig().getBoolean( "enable-criticals" ), getConfig().getBoolean( "old-criticals" ), getConfig().getInt( "max-cps" ), getConfig().getDouble( "max-reach" ) ) );
+                    setHitListener( new SmashHitListener( instance, getConfig().getLong( "damage-immunity" ), getConfig().getBoolean( "enable-criticals" ), getConfig().getBoolean( "old-criticals" ), getConfig().getInt( "max-cps" ), getConfig().getDouble( "max-reach" ) ) );
 
                     setHitListenerHandler( pmgr.getAsynchronousManager().registerAsyncHandler( getHitListener() ) );
                     getHitListenerHandler().start();

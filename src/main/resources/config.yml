@@ -9,6 +9,9 @@ old-criticals: false
 # How many clicks per second are we allowing?
 max-cps: 12
 
+#how much time in milliseconds an entity should be immune for after getting hit.
+damage-immunity: 500
+
 # How many blocks of reach can players have?
 max-reach: 3.85
 
