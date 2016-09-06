@@ -1,6 +1,6 @@
 package com.frash23.smashhit;
 
-import com.frash23.smashhit.util.Reflection;
+import com.frash23.smashhit.Util.Reflection;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

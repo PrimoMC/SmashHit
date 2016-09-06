@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.frash23.smashhit.util;
+package com.frash23.smashhit.Util;
 
 import org.bukkit.Bukkit;
 
