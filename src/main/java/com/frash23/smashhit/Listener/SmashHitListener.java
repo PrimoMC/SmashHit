@@ -10,21 +10,26 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 import com.frash23.smashhit.DamageResolver;
 import com.frash23.smashhit.Event.AsyncPreDamageEvent;
+import com.frash23.smashhit.Packet.WrapperPlayServerSetCooldown;
 import com.frash23.smashhit.SmashHit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
@@ -123,8 +128,11 @@ public class SmashHitListener extends PacketAdapter
 
                 if ( !damageEvent.isCancelled() )
                 {
-
                     pmgr.sendServerPacket( attacker, damageAnimation );
+                    for ( Player player : attacker.getNearbyEntities( 16, 16, 16 ).stream().filter( p -> p instanceof Player ).map( p -> (Player) p ).collect( Collectors.toList() ) )
+                    {
+                        pmgr.sendServerPacket( player, damageAnimation );
+                    }
 
                     /* Check if attacker's CPS is within the specified maximum */
                     int attackerCps = cps.containsKey( attacker.getUniqueId() ) ? cps.get( attacker.getUniqueId() ) : 0;
@@ -134,6 +142,10 @@ public class SmashHitListener extends PacketAdapter
                      * This should weed out some hackers nicely */
                     if ( attackerCps <= MAX_CPS )
                     {
+                        if ( target instanceof Player )
+                        {
+                            handleDisable( attacker, (Player) target );
+                        }
                         lastHit.put( target.getUniqueId(), System.currentTimeMillis() );
                         hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
                     }
@@ -152,5 +164,49 @@ public class SmashHitListener extends PacketAdapter
         cpsResetter.cancel();
         hitQueueProcessor.cancel();
         damageResolver = null;
+    }
+
+    private Random rand = new Random();
+
+    public void handleDisable( Player attacker, Player victim )
+    {
+        ItemStack item = attacker.getInventory().getItemInMainHand();
+
+        if ( item != null && item.getType().toString().contains( "AXE" ) && !item.getType().toString().contains( "PICKAXE" ) && victim.isBlocking() )
+        {
+            float chance = 0.25F + ( (float) item.getEnchantmentLevel( Enchantment.DIG_SPEED ) * 0.05F );
+
+            if ( attacker.isSprinting() )
+            {
+                chance += 0.75F;
+            }
+
+            if ( rand.nextFloat() < chance )
+            {
+                try
+                {
+                    PacketContainer shieldAnim = new PacketContainer( PacketType.Play.Server.ENTITY_STATUS );
+                    shieldAnim.getIntegers().write( 0, victim.getEntityId() );
+                    shieldAnim.getBytes().write( 0, (byte) 30 );
+
+                    ProtocolLibrary.getProtocolManager().sendServerPacket( attacker, shieldAnim );
+
+                    for ( Player player : attacker.getNearbyEntities( 16, 16, 16 ).stream().filter( p -> p instanceof Player ).map( p -> (Player) p ).collect( Collectors.toList() ) )
+                    {
+                        ProtocolLibrary.getProtocolManager().sendServerPacket( player, shieldAnim );
+                    }
+
+                    WrapperPlayServerSetCooldown cooldown = new WrapperPlayServerSetCooldown();
+                    cooldown.setItem( Material.SHIELD );
+                    cooldown.setTicks( 20 * 5 );
+                    cooldown.sendPacket( victim );
+
+                }
+                catch ( InvocationTargetException e )
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
