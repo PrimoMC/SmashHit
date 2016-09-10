@@ -1,6 +1,7 @@
 package com.frash23.smashhit;
 
 import com.frash23.smashhit.Particle.ParticleEffect;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,6 +27,7 @@ public class DamageResolver
                 {
                     damage *= 1.5;
                     ParticleEffect.CRIT.display( 0, 0, 0, .5f, 10, entity.getEyeLocation(), 16 );
+                    damager.playSound( damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1f );
                 }
             }
         }
