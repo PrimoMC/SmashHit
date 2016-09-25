@@ -100,75 +100,105 @@ public class SmashHitListener extends PacketAdapter
         LivingEntity target = entity instanceof LivingEntity ? (LivingEntity) entity : null;
         World world = attacker.getWorld();
 
-        /* Huge if() block to verify the hit request */
-        if ( e.getPacketType() == PacketType.Play.Client.USE_ENTITY            // Packet is for entity interaction
-                && packet.getEntityUseActions().read( 0 ) == EntityUseAction.ATTACK    // Packet is for entity damage
-                && target != null && !target.isDead()                            // Target entity is damageable
-                && world == target.getWorld()                  // Attacker & target are in the same world
-                && attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE            // Distance sanity check
-                && ( !( target instanceof Player ) || ( (Player) target ).getGameMode() != GameMode.CREATIVE ) ) // Don't hit Players in creative mode
+        //don't handle packets other than entity interaction.
+        if ( e.getPacketType() != PacketType.Play.Client.USE_ENTITY )
         {
-            // check to ensure pvp is enabled in the world if the target is a player.
-            if(target instanceof Player && !world.getPVP())
-            {
-                return;
-            }
+            return;
+        }
 
-            /* The check above ensures we can roll our own hits */
-            e.setCancelled( true );
-            if ( lastHit.containsKey( target.getUniqueId() ) && System.currentTimeMillis() - lastHit.get( target.getUniqueId() ) < IMMUNITY_MILLI )
+        //don't handle packets other than entity attacks.
+        if ( packet.getEntityUseActions().read( 0 ) != EntityUseAction.ATTACK )
+        {
+            return;
+        }
+
+        //don't hit entites who don't exist or are already dead.
+        if ( target == null || target.isDead() )
+        {
+            return;
+        }
+
+        //don't hit entities who are in a different world.
+        if ( world != target.getWorld() )
+        {
+            return;
+        }
+
+        //don't hit entities who are too far away from the attacker
+        if ( attacker.getLocation().distanceSquared( target.getLocation() ) >= MAX_DISTANCE )
+        {
+            return;
+        }
+
+        if ( target instanceof Player )
+        {
+            //don't hit players when pvp is disabled.
+            if ( !world.getPVP() )
             {
                 return;
             }
+            //don't hit players who are in creative mode.
+            if ( ( (Player) target ).getGameMode() == GameMode.CREATIVE )
+            {
+                return;
+            }
+        }
+
+        e.setCancelled( true );
+        //don't hit players when they're within the damage immunity time.
+        if ( lastHit.containsKey( target.getUniqueId() ) && System.currentTimeMillis() - lastHit.get( target.getUniqueId() ) < IMMUNITY_MILLI )
+        {
+            return;
+        }
             /* Construct the fake packet for making the attacker's
              * victim appear hit */
-            PacketContainer damageAnimation = new PacketContainer( PacketType.Play.Server.ENTITY_STATUS );
-            damageAnimation.getIntegers().write( 0, target.getEntityId() );
-            damageAnimation.getBytes().write( 0, (byte) 2 );
+        PacketContainer damageAnimation = new PacketContainer( PacketType.Play.Server.ENTITY_STATUS );
+        damageAnimation.getIntegers().write( 0, target.getEntityId() );
+        damageAnimation.getBytes().write( 0, (byte) 2 );
 
-            try
+        try
+        {
+            double damage = damageResolver.getDamage( attacker, target );
+
+            AsyncPreDamageEvent damageEvent = new AsyncPreDamageEvent( attacker, target, damage );
+            getPluginManager().callEvent( damageEvent );
+
+            if ( !damageEvent.isCancelled() )
             {
-                double damage = damageResolver.getDamage( attacker, target );
-
-                AsyncPreDamageEvent damageEvent = new AsyncPreDamageEvent( attacker, target, damage );
-                getPluginManager().callEvent( damageEvent );
-
-                if ( !damageEvent.isCancelled() )
+                if ( damageResolver.isCrit( attacker ) )
                 {
-                    if(damageResolver.isCrit( attacker ))
-                    {
-                        ParticleEffect.CRIT.display( 0, 0, 0, .5f, 10, target.getEyeLocation(), 16 );
-                        attacker.playSound( attacker.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1f );
-                    }
-                    pmgr.sendServerPacket( attacker, damageAnimation );
-                    for ( Player player : attacker.getNearbyEntities( 16, 16, 16 ).stream().filter( p -> p instanceof Player ).map( p -> (Player) p ).collect( Collectors.toList() ) )
-                    {
-                        pmgr.sendServerPacket( player, damageAnimation );
-                    }
+                    ParticleEffect.CRIT.display( 0, 0, 0, .5f, 10, target.getEyeLocation(), 16 );
+                    attacker.playSound( attacker.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1f );
+                }
+                pmgr.sendServerPacket( attacker, damageAnimation );
+                for ( Player player : attacker.getNearbyEntities( 16, 16, 16 ).stream().filter( p -> p instanceof Player ).map( p -> (Player) p ).collect( Collectors.toList() ) )
+                {
+                    pmgr.sendServerPacket( player, damageAnimation );
+                }
 
                     /* Check if attacker's CPS is within the specified maximum */
-                    int attackerCps = cps.containsKey( attacker.getUniqueId() ) ? cps.get( attacker.getUniqueId() ) : 0;
-                    cps.put( attacker.getUniqueId(), attackerCps + 1 );
+                int attackerCps = cps.containsKey( attacker.getUniqueId() ) ? cps.get( attacker.getUniqueId() ) : 0;
+                cps.put( attacker.getUniqueId(), attackerCps + 1 );
 
                     /* By handling CPS this way, the recorded CPS will still increment even if the limit is reached.
                      * This should weed out some hackers nicely */
-                    if ( attackerCps <= MAX_CPS )
+                if ( attackerCps <= MAX_CPS )
+                {
+                    if ( target instanceof Player )
                     {
-                        if ( target instanceof Player )
-                        {
-                            handleDisable( attacker, (Player) target );
-                        }
-                        lastHit.put( target.getUniqueId(), System.currentTimeMillis() );
-                        hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
+                        handleDisable( attacker, (Player) target );
                     }
+                    lastHit.put( target.getUniqueId(), System.currentTimeMillis() );
+                    hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
                 }
+            }
 
-            }
-            catch ( InvocationTargetException err )
-            {
-                throw new RuntimeException( "Error while sending damage packet: ", err );
-            }
         }
+        catch ( InvocationTargetException err )
+        {
+            throw new RuntimeException( "Error while sending damage packet: ", err );
+        }
+
     }
 
     public void stop()
