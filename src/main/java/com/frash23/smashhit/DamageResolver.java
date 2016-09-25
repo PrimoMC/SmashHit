@@ -19,22 +19,30 @@ public class DamageResolver
     public double getDamage( Player damager, LivingEntity entity )
     {
         double damage = damager.getAttribute( Attribute.GENERIC_ATTACK_DAMAGE ).getValue();
+        if(isCrit( damager ))
+        {
+            damage *= 1.5;
+        }
+        return damage;
+    }
+
+    public boolean isCrit(Player damager)
+    {
+
         if ( USE_CRITS )
         {
             if ( ( !damager.isOnGround() && damager.getVelocity().getY() < 0 ) )
             {
                 if ( !( !OLD_CRITS && damager.isSprinting() ) )
                 {
-                    damage *= 1.5;
-                    ParticleEffect.CRIT.display( 0, 0, 0, .5f, 10, entity.getEyeLocation(), 16 );
-                    damager.playSound( damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1f );
+                   return true;
                 }
             }
         }
-        return damage;
+        return false;
     }
 
-    DamageResolver( boolean useCrits, boolean oldCrits )
+    private DamageResolver( boolean useCrits, boolean oldCrits )
     {
         USE_CRITS = useCrits;
         OLD_CRITS = oldCrits;

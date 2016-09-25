@@ -11,9 +11,11 @@ import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 import com.frash23.smashhit.DamageResolver;
 import com.frash23.smashhit.Event.AsyncPreDamageEvent;
 import com.frash23.smashhit.Packet.WrapperPlayServerSetCooldown;
+import com.frash23.smashhit.Particle.ParticleEffect;
 import com.frash23.smashhit.SmashHit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Damageable;
@@ -104,8 +106,8 @@ public class SmashHitListener extends PacketAdapter
                 && target != null && !target.isDead()                            // Target entity is damageable
                 && world == target.getWorld() && world.getPVP()                    // Attacker & target are in the same world
                 && attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE            // Distance sanity check
-                && ( !( target instanceof Player ) || ( (Player) target ).getGameMode() != GameMode.CREATIVE ) )
-        { // Don't hit Players in creative mode
+                && ( !( target instanceof Player ) || ( (Player) target ).getGameMode() != GameMode.CREATIVE ) ) // Don't hit Players in creative mode
+        {
 
             /* The check above ensures we can roll our own hits */
             e.setCancelled( true );
@@ -128,6 +130,11 @@ public class SmashHitListener extends PacketAdapter
 
                 if ( !damageEvent.isCancelled() )
                 {
+                    if(damageResolver.isCrit( attacker ))
+                    {
+                        ParticleEffect.CRIT.display( 0, 0, 0, .5f, 10, target.getEyeLocation(), 16 );
+                        attacker.playSound( attacker.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1f );
+                    }
                     pmgr.sendServerPacket( attacker, damageAnimation );
                     for ( Player player : attacker.getNearbyEntities( 16, 16, 16 ).stream().filter( p -> p instanceof Player ).map( p -> (Player) p ).collect( Collectors.toList() ) )
                     {
