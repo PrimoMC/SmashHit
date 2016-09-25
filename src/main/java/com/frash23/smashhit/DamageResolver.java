@@ -16,7 +16,7 @@ public class DamageResolver
 
     private boolean USE_CRITS, OLD_CRITS;
 
-    public double getDamage( Player damager, LivingEntity entity )
+    public double getDamage( Player damager )
     {
         double damage = damager.getAttribute( Attribute.GENERIC_ATTACK_DAMAGE ).getValue();
         if(isCrit( damager ))

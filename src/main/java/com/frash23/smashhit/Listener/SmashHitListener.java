@@ -154,7 +154,7 @@ public class SmashHitListener extends PacketAdapter
 
         try
         {
-            double damage = damageResolver.getDamage( attacker, target );
+            double damage = damageResolver.getDamage( attacker );
 
             AsyncPreDamageEvent damageEvent = new AsyncPreDamageEvent( attacker, target, damage );
             getPluginManager().callEvent( damageEvent );
