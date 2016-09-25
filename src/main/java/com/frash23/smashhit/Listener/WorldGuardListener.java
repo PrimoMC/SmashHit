@@ -39,12 +39,13 @@ public class WorldGuardListener implements Listener
         }
         else if ( entity instanceof Animals )
         {
-            flags = new StateFlag[]{ DefaultFlag.DAMAGE_ANIMALS, DefaultFlag.MOB_DAMAGE };
+            flags = new StateFlag[]{ DefaultFlag.DAMAGE_ANIMALS };
         }
         else
         {
-            flags = new StateFlag[]{ DefaultFlag.MOB_DAMAGE };
+            flags = null;
         }
+
         if ( !test( wgrm, damager, entity, flags ) )
         {
             e.setCancelled( true );
@@ -53,6 +54,10 @@ public class WorldGuardListener implements Listener
 
     private boolean test( RegionManager wgrm, Player damager, Damageable entity, StateFlag... flag )
     {
+        if(flag == null)
+        {
+            return true;
+        }
         ApplicableRegionSet set = wgrm.getApplicableRegions( damager.getLocation() );
         if ( set.queryState( wg.wrapPlayer( damager ), flag ) == StateFlag.State.DENY )
         {
