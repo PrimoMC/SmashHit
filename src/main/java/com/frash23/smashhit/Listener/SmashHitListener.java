@@ -58,10 +58,6 @@ public class SmashHitListener extends PacketAdapter
         pmgr = ProtocolLibrary.getProtocolManager();
 
         damageResolver = DamageResolver.getDamageResolver( useCrits, oldCrits );
-        if ( damageResolver == null )
-        {
-            throw new NullPointerException( "Damage resolver is null, unsupported Spigot version?" );
-        }
 
         MAX_CPS = (byte) maxCps;
         MAX_DISTANCE = (float) maxDistance * (float) maxDistance;
