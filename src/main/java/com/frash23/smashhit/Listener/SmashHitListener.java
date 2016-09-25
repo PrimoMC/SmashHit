@@ -104,10 +104,15 @@ public class SmashHitListener extends PacketAdapter
         if ( e.getPacketType() == PacketType.Play.Client.USE_ENTITY            // Packet is for entity interaction
                 && packet.getEntityUseActions().read( 0 ) == EntityUseAction.ATTACK    // Packet is for entity damage
                 && target != null && !target.isDead()                            // Target entity is damageable
-                && world == target.getWorld() && world.getPVP()                    // Attacker & target are in the same world
+                && world == target.getWorld()                  // Attacker & target are in the same world
                 && attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE            // Distance sanity check
                 && ( !( target instanceof Player ) || ( (Player) target ).getGameMode() != GameMode.CREATIVE ) ) // Don't hit Players in creative mode
         {
+            // check to ensure pvp is enabled in the world if the target is a player.
+            if(target instanceof Player && !world.getPVP())
+            {
+                return;
+            }
 
             /* The check above ensures we can roll our own hits */
             e.setCancelled( true );
