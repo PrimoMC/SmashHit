@@ -27,6 +27,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Team;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -133,10 +134,25 @@ public class SmashHitListener extends PacketAdapter
             {
                 return;
             }
+
             //don't hit players who are in creative mode.
             if ( ( (Player) target ).getGameMode() == GameMode.CREATIVE )
             {
                 return;
+            }
+
+            //don't hit players who are in the same team without friendly fire.
+            if ( attacker.getScoreboard() != null )
+            {
+                Team team = attacker.getScoreboard().getEntryTeam( attacker.getName() );
+
+                if ( team != null )
+                {
+                    if ( !team.allowFriendlyFire() && team.hasEntry( target.getName() ) )
+                    {
+                        return;
+                    }
+                }
             }
         }
 
